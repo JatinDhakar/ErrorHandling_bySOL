@@ -3,8 +3,8 @@ pragma solidity 0.8.18;
 
 contract errorFinding
 {
-    uint public balance;
-    uint public pin;
+    uint  balance;
+    uint  pin;
 
     function Set_your_pin(uint _pin) public  
     {
