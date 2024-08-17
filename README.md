@@ -13,48 +13,73 @@ This program is a simple contract written in Solidity, a programming language us
 To run this program, you can use Remix, an online Solidity IDE. To get started, go to the Remix website at https://remix.ethereum.org/.
 
 Once you are on the Remix website, create a new file by clicking on the "+" icon in the left-hand sidebar. Save the file with a .sol extension (e.g., Code_for_Error_handling.sol). Copy and paste the following code into the file:
-
+`
     // SPDX-License-Identifier: UNLICENSED
-    pragma solidity 0.8.18;
+pragma solidity 0.8.26;
 
-    contract errorFinding
+contract TokenSharing 
     {
-         uint  balance;
-         uint  pin;
+    string public token;
+    address public owner;
+    uint public totalSupply;
+    uint oneTimeUse = 0 ;
+    mapping (address => uint) balance;
 
-    function Set_your_pin(uint _pin) public  
+    function A_setTokenName (string memory tokenName) public returns (string memory )
     {
-        pin = _pin;
+        token = tokenName;
+        owner = msg.sender;
+        return ("The account who have created the token name has became the owner of the contract");
     }
 
-    function Deposit(uint _amount) public 
+    function B_setTokenAmount(uint TokenNo) public 
     {
-        if(_amount <= 0)
+
+        if(oneTimeUse == 0)
         {
-            revert("invalid amount is entered");
+        assert(msg.sender == owner);
+        balance[owner] = TokenNo;
+        totalSupply = TokenNo;
+        oneTimeUse = 1;
         }
 
-        else
-        {
-            balance = balance + _amount;
+        else {
+            revert ("Token amount can not be set twice");
         }
     }
 
-    function Withdraw(uint _amount ) public returns(uint)
+    function C_mintToken ( address reciever , uint amount) public 
     {
-        require(_amount < balance , "Your request amount is more than the balance in the wallet.");
-        balance = balance - _amount;
-        return balance;
+        require (msg.sender == owner , "Only owner can mint the tokens");
+        require (amount > 0 , "Required amount can not be negative or zero");
+        balance[owner] -= amount;
+        balance[reciever] += amount;
     }
 
-    function Get_Balance(uint _pin) public view returns(uint)
+    function D_transferToken ( address reciever , uint amount) public 
     {
-        assert(_pin == pin);
-        return balance;
-
+        assert(balance[msg.sender] >= amount);
+        balance[msg.sender] -= amount;
+        balance[reciever] += amount;
     }
+
+    function E_burnToken(uint amount) public 
+    {
+        if(balance[msg.sender] < amount || amount == 0)
+        {
+            revert("invalid amount of token to be burnt");
+        }
+
+        else {
+            balance[msg.sender] -= amount;
+        }
     }
 
+    function F_FindBalance (address account) public view returns (uint)
+    {
+        return balance[account];
+    }
+    }`
 To compile the code, click on the "Solidity Compiler" tab in the left-hand sidebar. Make sure the "Compiler" option is set to "0.8.18" (or another compatible version), and then click on the "Compile Code_for_Error_handling.sol" button.
 
 Once the code is compiled, you can deploy the contract by clicking on the "Deploy & Run Transactions" tab in the left-hand sidebar. Select the "errorFinding" contract from the dropdown menu, and then click on the "Deploy" button.
