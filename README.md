@@ -12,83 +12,52 @@ This program is a simple contract written in Solidity, a programming language us
 
 To run this program, you can use Remix, an online Solidity IDE. To get started, go to the Remix website at https://remix.ethereum.org/.
 
-Once you are on the Remix website, create a new file by clicking on the "+" icon in the left-hand sidebar. Save the file with a .sol extension (e.g., TokenSharing.sol). Copy and paste the following code into the file:
+Once you are on the Remix website, create a new file by clicking on the "+" icon in the left-hand sidebar. Save the file with a .sol extension (e.g., BidingAuction.sol). Copy and paste the following code into the file:
 ```
-    // SPDX-License-Identifier: UNLICENSED
+   // SPDX-License-Identifier: MIT
 pragma solidity 0.8.26;
 
-contract TokenSharing 
-    {
-    string public token;
+contract Auction {
     address public owner;
-    uint public totalSupply;
-    uint oneTimeUse = 0 ;
-    mapping (address => uint) balance;
+    string public itemName;
+    uint256 public highestBid;
+    address public highestBidder;
 
-    function A_setTokenName (string memory tokenName) public returns (string memory )
-    {
-        token = tokenName;
+    constructor(string memory _itemName) {
         owner = msg.sender;
-        return ("The account who have created the token name has became the owner of the contract");
+        itemName = _itemName;
     }
 
-    function B_setTokenAmount(uint TokenNo) public 
-    {
+    function placeBid() external payable {
+        // Example usage of require()
+        require(msg.value > highestBid, "Bid must be higher than the current highest bid");
 
-        if(oneTimeUse == 0)
-        {
-        assert(msg.sender == owner);
-        balance[owner] = TokenNo;
-        totalSupply = TokenNo;
-        oneTimeUse = 1;
+        // Example usage of assert()
+        assert(msg.sender != owner); // Bidders cannot be the owner
+
+        // Update highest bid
+        highestBid = msg.value;
+        highestBidder = msg.sender;
+    }
+
+    function finalizeAuction() external {
+        // Example usage of revert()
+        if (msg.sender != owner) {
+            revert("Only the owner can finalize the auction");
         }
-
-        else {
-            revert ("Token amount can not be set twice");
-        }
+        owner = highestBidder;
     }
-
-    function C_mintToken ( address reciever , uint amount) public 
-    {
-        require (msg.sender == owner , "Only owner can mint the tokens");
-        require (amount > 0 , "Required amount can not be negative or zero");
-        balance[owner] -= amount;
-        balance[reciever] += amount;
-    }
-
-    function D_transferToken ( address reciever , uint amount) public 
-    {
-        assert(balance[msg.sender] >= amount);
-        balance[msg.sender] -= amount;
-        balance[reciever] += amount;
-    }
-
-    function E_burnToken(uint amount) public 
-    {
-        if(balance[msg.sender] < amount || amount == 0)
-        {
-            revert("invalid amount of token to be burnt");
-        }
-
-        else {
-            balance[msg.sender] -= amount;
-        }
-    }
-
-    function F_FindBalance (address account) public view returns (uint)
-    {
-        return balance[account];
-    }
-    }
+}
 ```
-To compile the code, click on the "Solidity Compiler" tab in the left-hand sidebar. Make sure the "Compiler" option is set to "0.8.18" (or another compatible version), and then click on the "Compile TokenSharing.sol" button.
+To compile the code, click on the "Solidity Compiler" tab in the left-hand sidebar. Make sure the "Compiler" option is set to "0.8.26" (or another compatible version), and then click on the "Compile BidingAuction.sol" button.
 
-Once the code is compiled, you can deploy the contract by clicking on the "Deploy & Run Transactions" tab in the left-hand sidebar. Select the "TokemSharing" contract from the dropdown menu, and then click on the "Deploy" button.
-Now you can test or run all the funtions of the smart contract.
+Once the code is compiled, you can deploy the contract by clicking on the "Deploy & Run Transactions" tab in the left-hand sidebar. Select the "Auction" contract from the dropdown menu, and then click on the "Deploy" button.
+
+Now you can test and run all the funtions of the smart contract. Provide a name for the item while deploying the contract and then pass the amount in the value section to bid the item.
 
 ## Authors
 
-Jatin dhakar
+Jatin Dhakar
 
 
 ## License
